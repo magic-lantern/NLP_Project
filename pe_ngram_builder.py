@@ -7,10 +7,11 @@ import sqlite3
 import os
 from nltk.util import ngrams
 from nltk.probability import FreqDist
+from nltk.corpus import stopwords
 import re
 
 # number of n for word ngrams to build
-n = 5
+n = 3
 report_col = 4
 text = ''
 
@@ -50,8 +51,15 @@ output = re.sub('\.', '', output)
 # covert to lower case to find all ngram matches regardless of case
 output = output.lower()
 
+# remove stop words
+new_output = ''
+stops = set(stopwords.words("english"))
+for t in output.split():
+    if t not in stops:
+        new_output += ' ' + t
+
 # this is a generator object. Once iterate through it, it is empty
-grams = ngrams(output.split(), n)
+grams = ngrams(new_output.split(), n)
 
 fdist = FreqDist(grams)
 #for ng, count in fdist.items():
