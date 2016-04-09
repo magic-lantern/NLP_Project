@@ -275,12 +275,10 @@ with connection:
             missing_count += 1
 
         logging.debug('completed processing record ' + str(row[col_names.index("ROW_ID")]))
+        print('Adding row_id', row[col_names.index("ROW_ID")], 'to Solr.')
+        solr.add([document])
 
     print('Found Searched for sections: ', found_count)
     print('No impression but findings: ', finding_count)
     print('Missing:', missing_count)
     print('Total:', total_count)
-        #print('Adding row_id', row[col_names.index("ROW_ID")], 'to Solr.')
-        #solr.add([document])
-
-print()
