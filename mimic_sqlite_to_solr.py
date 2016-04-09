@@ -18,6 +18,9 @@ connection = sqlite3.connect(sqlitedb)
 
 # Connect to Solr instance.
 solr = pysolr.Solr('http://192.168.99.100:8983/solr/radiology')
+# if need to purge all indexed items from solr, do an HTTP get on these 2 URLs
+#http://192.168.99.100:8983/solr/radiology/update?stream.body=<delete><query>*:*</query></delete>
+#http://192.168.99.100:8983/solr/radiology/update?stream.body=<commit/>
 
 with connection:
     cur = connection.cursor()
@@ -58,6 +61,8 @@ with connection:
         document = {}
         # want row_id, subject_id, hadm_id, description, text
         document['id'] = row[col_names.index("ROW_ID")]
+        # also store row_id as an integer to allow for better sorting
+        document['ROW_ID_i'] = row[col_names.index("ROW_ID")]
         document['SUBJECT_ID_i'] = row[col_names.index("SUBJECT_ID")]
         # not all reports have a hospital admission id, so this may not be in Solr
         document['HADM_ID_i'] = row[col_names.index("HADM_ID")]
@@ -67,9 +72,14 @@ with connection:
         document['TEXT_t'] = row[col_names.index("TEXT")]
 
         """
-        Out of 108,896 reports, only 4 don't use 'REASON FOR THIS EXAMINATION:'
+        Out of 108,896 reports, only 4 don't have 'REASON FOR THIS EXAMINATION:'
         or 'Reason:' for the reason for exam section. By manual inspection, those 4
         reports are not ones related to PE nor PAH.
+
+        However, some have a reason section, but it is empty. Based on looking at additional
+        those with empty reason do have an 'INDICATION:' section that appears to serve the
+        same purpose. Need to add identification of INDICATION section if REASON section
+        empty
 
         Reports can have multiple reason sections. From inspection of the data,
           * ^'Reason:' (if it exists) is just a one line section and is a portion of the
@@ -77,7 +87,6 @@ with connection:
           * ^'REASON FOR THIS EXAMINATION:' (if it exists) is a multi-line section and the actual
             reason starts on the next line. There are 3 cases where this section was repeated and
             in some of the repeated locations the reason may partially be on the same line.
-
         """
         reason_short = ''
         reason_long = ''
