@@ -3,6 +3,10 @@ import os
 import pysolr
 import re
 import sys
+import logging
+
+# uncomment this to get detailed logging
+#logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 sqlitedb = os.path.join(os.path.expanduser('~'), 'Box Sync', 'GradSchoolStuff',
                         'MastersProject', 'mimic3', 'mimic3.sqlite')
@@ -27,8 +31,8 @@ with connection:
     col_names = [cn[0] for cn in cur.description]
 
     # general match for section start
-    #section_re = re.compile('^\s+([A-Z]+\s*){2,}:*')
-    section_re = re.compile('^\s+([A-Z]+\s*){2,}(:|$)+')
+    section_re1 = re.compile('^\s+[A-Z/]{3,}(:|$)')
+    section_re2 = re.compile('^\s+([A-Z/()]+(?=\s[A-Z/()])(?:\s+[A-Z/()]+)+)[:;]')
 
     # patterns for reason section
     reason_1 = re.compile('^\s*REASON FOR THIS EXAMINATION:\s*$')
@@ -50,8 +54,8 @@ with connection:
     finding_count = 0
 
     for row in recordset:
+        logging.debug('evaluating: ' + str(row[col_names.index("ROW_ID")]))
         document = {}
-        #print('++++++', col_names[idx], ': ', col)
         # want row_id, subject_id, hadm_id, description, text
         document['id'] = row[col_names.index("ROW_ID")]
         document['SUBJECT_ID_i'] = row[col_names.index("SUBJECT_ID")]
@@ -80,6 +84,7 @@ with connection:
         if ('REASON FOR THIS EXAMINATION:' in row[col_names.index("TEXT")]
             or 'Reason:' in row[col_names.index("TEXT")]
            ):
+            logging.debug('reason section: ' + str(row[col_names.index("ROW_ID")]))
             found_multiline = ''
             for line in row[col_names.index("TEXT")].rstrip().split('\n'):
                 # multi-line reason section start -------------
@@ -97,12 +102,12 @@ with connection:
                         found_multiline = False
             if len(reason_long.strip()) > 0:
                 document['REASON_t'] = reason_long.strip()
-                #print(row[col_names.index("ROW_ID")], 'reason_long', reason_long.strip())
+                logging.debug(str(row[col_names.index("ROW_ID")]) + ' reason_long: ' + reason_long.strip())
             else:
                 document['REASON_t'] = reason_short
-                #print(row[col_names.index("ROW_ID")], 'reason_short', reason_short)
+                logging.debug(str(row[col_names.index("ROW_ID")]) + ' reason_short: ' + reason_short)
         else:
-            print('------------reason missing for', row[col_names.index("ROW_ID")])
+            logging.debug('------------reason missing for ' + str(row[col_names.index("ROW_ID")]))
 
         '''
         Identify impression section. Generally starts with 'IMPRESSION:' followed by newline, then text
@@ -139,6 +144,7 @@ with connection:
             or 'SUMMARY' in row[col_names.index("TEXT")]
             or 'Summary' in row[col_names.index("TEXT")]
            ):
+            logging.debug('impression section: ' + str(row[col_names.index("ROW_ID")]))
             found_count += 1
             found_match_per_record = 0
             section = ''
@@ -147,48 +153,54 @@ with connection:
                 # it is possible that there are multiple 'impression' or impression-like sections
                 # if there are multiple sections, keep all of them.
                 if impression_1.match(line) is not None:
+                    logging.debug('impression section regex1 matched: ' + str(row[col_names.index("ROW_ID")]))
                     found_impression = True
                     found_match_per_record += 1
                     section += impression_1.sub('', line)
                     found_section = True
-                    #print(row[col_names.index("ROW_ID")], line)
+                    logging.debug(str(row[col_names.index("ROW_ID")]) + ' ' + line)
                     continue
 
                 if impression_2.match(line) is not None:
+                    logging.debug('impression section regex2 matched: ' + str(row[col_names.index("ROW_ID")]))
                     found_conclusion = True
                     found_match_per_record += 1
                     section += impression_2.sub('', line)
                     found_section = True
-                    #print(row[col_names.index("ROW_ID")], line)
+                    logging.debug(str(row[col_names.index("ROW_ID")]) + ' ' + line)
                     continue
 
                 if impression_3.match(line) is not None:
+                    logging.debug('impression section regex3 matched: ' + str(row[col_names.index("ROW_ID")]))
                     found_summary = True
                     found_match_per_record += 1
                     section += impression_3.sub('', line)
                     found_section = True
-                    #print(row[col_names.index("ROW_ID")], line)
+                    logging.debug(str(row[col_names.index("ROW_ID")]) + ' ' + line)
                     continue
 
                 # should add to reason_long until end of section
                 if found_section:
+                    logging.debug('impression section found_section matched: ' + str(row[col_names.index("ROW_ID")]) + line)
                     if '(Over)' in line:
                         skip_section = True
                         found_section = False
-                    elif section_re.match(line) is None:
-                        #print(row[col_names.index("ROW_ID")], 'continuing section: ', line)
+                    elif section_re1.match(line) is None and section_re2.match(line) is None:
+                        logging.debug(str(row[col_names.index("ROW_ID")]) + ' continuing section: ' + line)
                         section += line
                     else:
-                        #print(row[col_names.index("ROW_ID")], 'ending section: ', line)
+                        logging.debug(str(row[col_names.index("ROW_ID")]) + 'ending section: ' + line)
                         found_section = False
 
                 # page breaks are normally wrapped in (Over)...(Cont)
                 if skip_section:
+                    logging.debug('impression section skip matched: ' + str(row[col_names.index("ROW_ID")]) + ' ' + line)
                     if '(Cont)' in line:
                         skip_section = False
                         found_section = True
 
             document['IMPRESSION_t'] = section
+            logging.debug(str(row[col_names.index("ROW_ID")]) + ' IMPRESSION section: ' + section)
 
             # this section for debugging purposes to look at documents with multiple impression-like
             # sections
@@ -213,18 +225,19 @@ with connection:
             ('FINDING' in row[col_names.index("TEXT")] or
             'PFI' in row[col_names.index("TEXT")])
            ):
+            logging.debug(str(row[col_names.index("ROW_ID")]) + ' findings section')
             for line in row[col_names.index("TEXT")].rstrip().split('\n'):
                 if finding_1.match(line) is not None:
                     found_findings = True
                     section += finding_1.sub('', line)
                     found_section = True
-                    #print(row[col_names.index("ROW_ID")], line)
+                    logging.debug(str(row[col_names.index("ROW_ID")]) + ' ' + line)
                     continue
                 elif finding_2.match(line) is not None:
                     found_findings = True
                     section += finding_2.sub('', line)
                     found_section = True
-                    #print(row[col_names.index("ROW_ID")], line)
+                    logging.debug(str(row[col_names.index("ROW_ID")]) + ' ' + line)
                     continue
 
                 # should add to finding like section until end of section
@@ -232,7 +245,7 @@ with connection:
                     if '(Over)' in line:
                         skip_section = True
                         found_section = False
-                    elif section_re.match(line) is None:
+                    elif section_re1.match(line) is None and section_re2.match(line) is None:
                         section += line
                     else:
                         found_section = False
@@ -247,7 +260,7 @@ with connection:
                 if ('IMPRESSION_t' in document):
                     print('THIS SHOULD NOT BE POSSIBLE')
                 document['IMPRESSION_t'] = section
-                #print(row[col_names.index("ROW_ID")], 'section found:', section )
+                logging.debug(str(row[col_names.index("ROW_ID")]) + ' section found: ' + section )
                 finding_count += 1
 
         elif 'IMPRESSION_t' not in document:
@@ -261,7 +274,9 @@ with connection:
            ):
             missing_count += 1
 
-    print('Found:', found_count)
+        logging.debug('completed processing record ' + str(row[col_names.index("ROW_ID")]))
+
+    print('Found Searched for sections: ', found_count)
     print('No impression but findings: ', finding_count)
     print('Missing:', missing_count)
     print('Total:', total_count)
