@@ -1,0 +1,19 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <h2 id="title">Annotator For Radiolgy Reporting</h2>
+    <ul class="nav nav-tabs">
+      {{#link-to "index" tagName="li" }}<a href="">Home</a>{{/link-to}}
+      {{#link-to "viewannotation" tagName="li" }}<a href="">View Annotation</a>{{/link-to}}
+      {{#link-to "editannotation" tagName="li" }}<a href="">Edit/Create Annotation</a>{{/link-to}}
+    </ul>
+  </div>
+</nav>
+
+{{outlet}}
+
+<footer class="footer">
+  <div class="container">
+    <p class="text-muted">Source code available at <a href="https://github.com/magic-lantern/NLP_Project">https://github.com/magic-lantern/NLP_Project</a></p>
+    <p class="text-muted">Copyright © 2016 Seth Russell, Licensed under the Apache License, Version 2.0.</p>
+  </div>
+</footer>
