@@ -8,6 +8,7 @@ const Router = Ember.Router.extend({
 Router.map(function() {
   this.route('viewannotation');
   this.route('editannotation');
+  this.route('diseaseconcepts');
 });
 
 export default Router;

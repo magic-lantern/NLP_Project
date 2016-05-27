@@ -1,0 +1,76 @@
+<div class="col-md-8 col-md-offset-2">
+  <form class="form-inline">
+    <div class="form-group">
+      <label class="sr-only" for="diseaseSelect">Disease</label>
+      <select id="diseaseSelect" class="form-control">
+        <option> - Select Disease - </option>
+        <option>Pulmonary Arterial Hypertension</option>
+        <option>Pulmonary Embolism</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="inputconcept">Concept</label>
+      <input type="text" class="form-control" id="input-concept" placeholder="Concept">
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="inputconcept">Synonyms</label>
+      <input type="text" class="form-control" id="input-synonym" placeholder="Synonym">
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="diseaseSelect">Report Location</label>
+      <select id="diseaseSelect" class="form-control">
+        <option> - Select Report Location - </option>
+        <option>Clinical History</option>
+        <option>Technique</option>
+        <option>Findings</option>
+        <option>Impressions/Conclusions</option>
+      </select>
+    </div>
+    <button class="btn btn-primary config-button" type="button"><i class="glyphicon glyphicon-plus"></i></button>
+  </form>
+</div>
+<br />
+<br />
+<br />
+<div class="col-md-8 col-md-offset-2">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Disease</th>
+        <th>Concept</th>
+        <th>Synonyms</th>
+        <th>Report Location</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Pulmonary Arterial Hypertension</td>
+        <td>Sample Concept</td>
+        <td>Synonym</td>
+        <td>Impressions/Conclusions</td>
+        <td>
+          <button class="btn btn-danger" type="button" {{action "deleteValue" value}}><i class="glyphicon glyphicon-trash"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td>Pulmonary Arterial Hypertension</td>
+        <td>Sample Concept 2</td>
+        <td>Synonym</td>
+        <td>Technique</td>
+        <td>
+          <button class="btn btn-danger" type="button" {{action "deleteValue" value}}><i class="glyphicon glyphicon-trash"></i></button>
+        </td>
+      </tr>
+      <tr>
+        <td>Pulmonary Embolism</td>
+        <td>Sample Concept 3</td>
+        <td>Synonym</td>
+        <td>Technique</td>
+        <td>
+          <button class="btn btn-danger" type="button" {{action "deleteValue" value}}><i class="glyphicon glyphicon-trash"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{{outlet}}
