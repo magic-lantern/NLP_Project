@@ -3,6 +3,23 @@
 This README outlines the details of collaborating on this Ember application.
 A short introduction of this app could easily go here.
 
+## Current Project To Do List:
+* Create project summary for Home Page
+* Fix footer - doesn't stay at bottom of page if scrolling required
+* View Annotations Tab:
+  * Should be interactive
+  * Retrieve information from data store
+* Edit/Create Annotations Tab:
+  * Should be interactive
+  * Should store information to data store
+* Disease Concepts Page Tab:
+  * Should be interactive
+  * Store information to data store
+* User Authentication - should be required for all tabs other than Home
+  * All actions should be logged per user.
+  * Annotations should be per user.
+  * Concepts should be global.
+
 ## Prerequisites
 
 You will need the following things properly installed on your computer.
@@ -50,4 +67,3 @@ Specify what it takes to deploy your app.
 * Development Browser Extensions
   * [ember inspector for chrome](https://chrome.google.com/webstore/detail/ember-inspector/bmdblncegkenkacieihfhpjfppoconhi)
   * [ember inspector for firefox](https://addons.mozilla.org/en-US/firefox/addon/ember-inspector/)
-

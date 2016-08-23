@@ -1,0 +1,23 @@
+http://brat.nlplab.org/
+http://brat.nlplab.org/examples.html
+
+https://www.quora.com/Natural-Language-Processing-What-are-the-best-tools-for-manually-annotating-a-text-corpus-with-entities-and-relationships
+
+https://docs.google.com/spreadsheets/d/14ionbRVYBQuD0cNLazKfRWYzrkax3qFCspm9SiaG5Aw/edit#gid=0
+copied sheet to my google docs
+
+http://mmax2.sourceforge.net/  - Java desktop app, probably not worth looking into further.
+
+https://gate.ac.uk/teamware/
+
+Firefox add ons--------------
+https://addons.mozilla.org/en-US/firefox/addon/webannotator/
+https://perso.limsi.fr/xtannier/en/WebAnnotator/
+
+https://addons.mozilla.org/en-US/firefox/addon/annotate-it/
+this one uses http://annotatorjs.org/ (https://github.com/openannotation/annotator/) and http://annotateit.org/ - could include those in project.
+
+https://addons.mozilla.org/en-US/firefox/addon/diigo-web-highlighter-and-stic/?src=search
+https://www.diigo.com/
+
+
