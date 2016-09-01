@@ -24,3 +24,7 @@ body {
 .navcontent {
   margin-right: 2rem;
 }
+.no-margin {
+  margin-left: 0;
+  margin-right: 0;
+}
