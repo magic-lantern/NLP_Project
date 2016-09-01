@@ -5,7 +5,6 @@ A short introduction of this app could easily go here.
 
 ## Current Project To Do List:
 * Create project summary for Home Page
-* Fix footer - doesn't stay at bottom of page if scrolling required
 * View Annotations Tab:
   * Should be interactive
   * Retrieve information from data store
